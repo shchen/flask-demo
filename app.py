@@ -9,58 +9,58 @@ from bokeh.util.string import encode_utf8
 import requests
 import pandas as pd
 
-app_stock = Flask(__name__)
+app = Flask(__name__)
 
-app_stock.vars = {}
+app.vars = {}
 
-app_stock.vars['color'] = {
+app.vars['color'] = {
     'Close': 'navy',
     'Adj. Close': 'orange',
     'Volume': 'green'
 }
 
-@app_stock.route('/')
+@app.route('/')
 def main():
     return redirect('/index')
 
-@app_stock.route('/error-quandle')
+@app.route('/error-quandle')
 def error_quandle():
     return render_template('error.html')
 
-@app_stock.route('/index', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
         return render_template('index.html')
     else:
-        app_stock.vars['ticker'] = request.form['ticker']
+        app.vars['ticker'] = request.form['ticker']
         #checked = request.form['features']
         #checked = request.form.getlist('features')  # list of checked
-        app_stock.vars['features'] = request.form.getlist('features')
+        app.vars['features'] = request.form.getlist('features')
 
         # Pull stock data
-        url = 'https://www.quandl.com/api/v3/datasets/WIKI/' + app_stock.vars['ticker'] + '/data.json'
+        url = 'https://www.quandl.com/api/v3/datasets/WIKI/' + app.vars['ticker'] + '/data.json'
         r = requests.get(url)
         if r.status_code == 404:
             return redirect('/error-quandle')
         else:
             data = r.json()['dataset_data']['data']
             cols = r.json()['dataset_data']['column_names']
-            app_stock.vars['data'] = pd.DataFrame(data, columns=cols)
-            #app_stock.vars['data'] = df[['Date'] + app_stock.vars['features']].head(5)
+            app.vars['data'] = pd.DataFrame(data, columns=cols)
+            #app.vars['data'] = df[['Date'] + app.vars['features']].head(5)
             return redirect('/graph')
 
 
-@app_stock.route('/graph', methods=['GET'])
+@app.route('/graph', methods=['GET'])
 def graph():
-    df = app_stock.vars['data']
+    df = app.vars['data']
 
     # Create a line plot from our data.
     p = figure(width=700, height=500, x_axis_type="datetime",
                 title="Data from Quandle WIKI set")
-    for category in app_stock.vars['features']:
+    for category in app.vars['features']:
         p.line(pd.to_datetime(df['Date']), df[category],
-                color=app_stock.vars['color'][category], line_width=1,
-                legend=app_stock.vars['ticker'] + ": " + category)
+                color=app.vars['color'][category], line_width=1,
+                legend=app.vars['ticker'] + ": " + category)
 
     p.legend.orientation = "top_right"
 
@@ -75,7 +75,7 @@ def graph():
     script, div = components(p, INLINE)
     html = render_template(
         'graph.html',
-        ticker=app_stock.vars['ticker'],
+        ticker=app.vars['ticker'],
         plot_script=script, plot_div=div, plot_resources=plot_resources
     )
     return encode_utf8(html)
@@ -83,5 +83,5 @@ def graph():
 
 
 if __name__ == '__main__':
-    #app_stock.run(port=33507)
-    app_stock.run('0.0.0.0')
+    #app.run(port=33507)
+    app.run('0.0.0.0')
