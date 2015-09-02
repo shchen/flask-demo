@@ -83,5 +83,4 @@ def graph():
 
 
 if __name__ == '__main__':
-    app_stock.debug = True
     app_stock.run(port=33507)
