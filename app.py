@@ -83,4 +83,5 @@ def graph():
 
 
 if __name__ == '__main__':
-    app_stock.run(port=33507)
+    #app_stock.run(port=33507)
+    app_stock.run('0.0.0.0')
