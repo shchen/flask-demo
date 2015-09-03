@@ -33,9 +33,10 @@ def index():
         return render_template('index.html')
     else:
         app.vars['ticker'] = request.form['ticker']
-        #checked = request.form['features']
-        #checked = request.form.getlist('features')  # list of checked
         app.vars['features'] = request.form.getlist('features')
+
+        if app.vars['ticker'] == '':
+            return redirect('/error-quandle')
 
         # Pull stock data
         url = 'https://www.quandl.com/api/v3/datasets/WIKI/' + app.vars['ticker'] + '/data.json'
