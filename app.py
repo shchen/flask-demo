@@ -35,7 +35,7 @@ def index():
         app.vars['ticker'] = request.form['ticker']
         app.vars['features'] = request.form.getlist('features')
 
-        if app.vars['ticker'] == '':
+        if app.vars['ticker'].strip() == '':
             return redirect('/error-quandle')
 
         # Pull stock data
